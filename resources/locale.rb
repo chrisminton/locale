@@ -42,14 +42,14 @@ action :update do
         locale = IO.read(locale_file_path)
         variables = Hash[locale.lines.map { |line| line.strip.split('=') }]
         variables['LANG'] = new_resource.lang
-        variables['LC_ALL'] =
-          variables.map { |pairs| pairs.join('=') }.join("\n") + "\n"
+        variables['LC_ALL'] = new_resource.lc_all
+        variables.map { |pairs| pairs.join('=') }.join("\n") + "\n"
       }
       not_if { updated }
     end
 
     execute "reload root's lang profile script" do
-      command 'source source /etc/sysconfig/i18n; source /etc/profile.d/lang.sh'
+      command 'source /etc/sysconfig/i18n; source /etc/profile.d/lang.sh'
       not_if { updated }
     end
   elsif ::File.exist?('/usr/sbin/update-locale')
